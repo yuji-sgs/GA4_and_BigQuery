@@ -1,0 +1,17 @@
+
+/*
+サイト内検索キーワードを取得
+*/
+
+select
+    (select value.string_value from unnest(event_params) where event_name = 'view_search_results' and key = 'search_term') as search_term, --イベントパラメータsearch_termを取得する
+    countif(event_name = 'view_search_results') as searches --検索結果の回数を取得する
+ 
+from
+    `ga4-bigquery-pj-392206.analytics_342165491.events_*`   　-- データの選択範囲。ここでは全期間とし、whereの部分で日付を指定する
+where
+    _table_suffix between '20240201' and '20240229' 　-- 日付の指定
+group by 
+    search_term --検索キーワードでグルーピングする
+order by 
+    searches desc --検索回数の降順でに並び替え
